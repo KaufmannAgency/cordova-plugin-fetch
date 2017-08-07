@@ -1,6 +1,7 @@
 package com.adobe.phonegap.fetch;
 
 import android.util.Log;
+import android.webkit.CookieManager;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Headers;
@@ -12,6 +13,7 @@ import com.squareup.okhttp.Response;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.LOG;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,6 +48,13 @@ public class FetchPlugin extends CordovaPlugin {
                 if (headers.has("map") && headers.getJSONObject("map") != null) {
                     headers = headers.getJSONObject("map");
                 }
+
+                headers.remove("cookie");
+                JSONArray cookieArray = new JSONArray();
+                String cookies = CookieManager.getInstance().getCookie(urlString);
+                LOG.i(LOG_TAG, "Setting cookies to headers: " + cookies);
+                cookieArray.put(cookies.toString());
+                headers.put("Cookie", cookieArray);
 
                 Log.v(LOG_TAG, "execute: headers = " + headers.toString());
 
