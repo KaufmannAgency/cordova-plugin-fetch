@@ -32,6 +32,9 @@ public class FetchPlugin extends CordovaPlugin {
     @Override
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
 
+        mClient.setFollowRedirects(false);
+        mClient.setFollowSslRedirects(false);
+        
         if (action.equals("fetch")) {
 
             try {
