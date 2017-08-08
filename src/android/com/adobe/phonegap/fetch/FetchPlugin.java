@@ -50,6 +50,7 @@ public class FetchPlugin extends CordovaPlugin {
                 }
 
                 headers.remove("cookie");
+                headers.remove("Cookie");
                 JSONArray cookieArray = new JSONArray();
                 String cookies = CookieManager.getInstance().getCookie(urlString);
                 LOG.i(LOG_TAG, "Setting cookies to headers: " + cookies);
