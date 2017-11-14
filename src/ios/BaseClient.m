@@ -25,6 +25,10 @@
   }];
   self.responseSerializer = [AFHTTPResponseSerializer serializer];
   
+  [self setTaskWillPerformHTTPRedirectionBlock:^NSURLRequest * _Nonnull(NSURLSession * _Nonnull session, NSURLSessionTask * _Nonnull task, NSURLResponse * _Nonnull response,  NSURLRequest * _Nonnull request) {
+    return nil;
+  }];
+  
   return self;
 }
 
