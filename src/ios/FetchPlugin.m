@@ -72,6 +72,10 @@
         [result setObject:[[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding] forKey:@"statusText"];
       }
       
+      if(response.statusCode == 307) {
+        [result setObject:[NSString stringWithString:@""] forKey:@"statusText"];
+      }
+
       CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
       [pluginResult setKeepCallbackAsBool:YES];
       [weakSelf.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
