@@ -21,6 +21,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+// import javax.net.ssl.HostnameVerifier;
+// import javax.net.ssl.SSLSession;
+
 public class FetchPlugin extends CordovaPlugin {
 
     public static final String LOG_TAG = "FetchPlugin";
@@ -34,6 +37,13 @@ public class FetchPlugin extends CordovaPlugin {
 
         mClient.setFollowRedirects(false);
         mClient.setFollowSslRedirects(false);
+
+        // mClient.setHostnameVerifier(new HostnameVerifier() {
+        //     @Override
+        //     public boolean verify(String hostname, SSLSession session) {
+        //         return true;
+        //     }
+        // });
         
         if (action.equals("fetch")) {
 
