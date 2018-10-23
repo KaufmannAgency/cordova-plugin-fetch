@@ -26,6 +26,8 @@
   
   if (headers[@"map"] != nil && [headers[@"map"] isKindOfClass:[NSDictionary class]]) {
     headers = headers[@"map"];
+    //headers[@"X-Pake-Client-Os"] = @"iOS";
+    //[headers setObject:@"iOS" forKey:@"X-Pake-Client-Os"];
   }
   
   FetchPlugin *__weak weakSelf = self;

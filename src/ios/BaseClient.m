@@ -72,6 +72,7 @@
     }
   }
   }
+  [request setValue:@"iOS" forHTTPHeaderField:@"X-Pake-Client-Os"];
   
   __block NSURLSessionDataTask *dataTask = nil;
   dataTask = [self dataTaskWithRequest:request completionHandler:^(NSURLResponse * __unused response, id responseObject, NSError *error) {
