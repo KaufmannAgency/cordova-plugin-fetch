@@ -112,6 +112,7 @@ public class FetchPlugin extends CordovaPlugin {
                         }
                     }
                 }
+                requestBuilder.addHeader("X-Pake-Client-Os", "Android");
 
                 Request request = requestBuilder.build();
 
