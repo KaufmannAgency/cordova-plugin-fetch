@@ -117,15 +117,17 @@ public class FetchPlugin extends CordovaPlugin {
                 Request request = requestBuilder.build();
 
                 mClient.newCall(request).enqueue(new Callback() {
+
                     @Override
                     public void onFailure(Request request, IOException throwable) {
-                        throwable.printStackTrace();
+                        Log.w(LOG_TAG, "Failure at onFailure() of HTTP call:\n" + Log.getStackTraceString(throwable));
                         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, throwable.getMessage()));
                     }
 
                     @Override
                     public void onResponse(Response response) throws IOException {
 
+                        Log.i(LOG_TAG, "Receiving HTTP response at onResponse()");
                         JSONObject result = new JSONObject();
                         try {
                             Headers responseHeaders = response.headers();
@@ -144,7 +146,8 @@ public class FetchPlugin extends CordovaPlugin {
                             result.put("url", response.request().urlString());
 
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Log.w(LOG_TAG, "Exception at onResponse() of HTTP call:\n" + Log.getStackTraceString(e));
+                            callbackContext.error(e.getMessage());
                         }
 
                         Log.v(LOG_TAG, "HTTP code: " + response.code());
@@ -154,8 +157,8 @@ public class FetchPlugin extends CordovaPlugin {
                     }
                 });
 
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "execute: Got JSON Exception " + e.getMessage());
+            } catch (Throwable e) {
+                Log.w(LOG_TAG, "Exception when invoking HTTP call:\n" + Log.getStackTraceString(e));
                 callbackContext.error(e.getMessage());
             }
 
