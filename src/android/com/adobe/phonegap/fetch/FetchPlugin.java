@@ -10,6 +10,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
+import com.squareup.okhttp.internal.tls.OkHostnameVerifier;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -20,9 +21,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
+
+
 
 public class FetchPlugin extends CordovaPlugin {
 
@@ -70,7 +75,30 @@ public class FetchPlugin extends CordovaPlugin {
         mClient.setHostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
-                return true;
+                try {
+                    Certificate[] certificates = session.getPeerCertificates();
+                    if(certificates == null) {
+                        Log.e(LOG_TAG, "Session has no certificates");
+                    }
+                    else {
+                        Log.d(LOG_TAG, "Certification count: " + certificates.length);
+                        for(Certificate certificate : certificates) {
+                            X509Certificate x509certificate = (X509Certificate) certificate;
+                            Log.d(LOG_TAG, "Found certificate: " + x509certificate.toString());
+                            if(OkHostnameVerifier.INSTANCE.verify(hostname, x509certificate)) {
+                                Log.d(LOG_TAG, "Verified OK");
+//                                return true;
+                            } else {
+                                Log.d(LOG_TAG, "Verified NOK");
+//                                continue;
+                            }
+                        }
+                    }
+                } catch (Throwable t) {
+                    Log.i(LOG_TAG, "Error verifying certificates: " + t.getMessage());
+                }
+                Log.i(LOG_TAG, "No certificate with matching hostname found.");
+                return true; // false;
             }
         });
         
