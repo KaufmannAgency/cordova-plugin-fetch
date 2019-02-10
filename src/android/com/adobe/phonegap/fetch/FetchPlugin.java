@@ -21,29 +21,58 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-// import javax.net.ssl.HostnameVerifier;
-// import javax.net.ssl.SSLSession;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
 public class FetchPlugin extends CordovaPlugin {
 
     public static final String LOG_TAG = "FetchPlugin";
     private static CallbackContext callbackContext;
 
-    private final OkHttpClient mClient = new OkHttpClient();
+    private OkHttpClient mClient = null;
     public static final MediaType MEDIA_TYPE_MARKDOWN = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
+
+    static {
+        Log.i(LOG_TAG, "Loading plugin fetch.");
+    }
+
+    public FetchPlugin() {
+        super();
+        Log.i(LOG_TAG, "Initializing plugin fetch.");
+        // try {
+        //     Log.i(LOG_TAG, "Initializing HTTP Client.");
+        //     mClient = new OkHttpClient();
+        //     Log.i(LOG_TAG, "HTTP Client initialized.");
+        // } catch (Throwable e) {
+        //     Log.w(LOG_TAG, "Exception when initializing HTTP Client:\n" + Log.getStackTraceString(e));
+        //     throw t;
+        // }
+    }
 
     @Override
     public boolean execute(final String action, final JSONArray data, final CallbackContext callbackContext) {
+        Log.i(LOG_TAG, "Invoking execute.");
+
+        if(mClient == null) {
+            try {
+                Log.i(LOG_TAG, "Initializing HTTP Client.");
+                mClient = new OkHttpClient();
+                Log.i(LOG_TAG, "HTTP Client initialized.");
+            } catch (Throwable e) {
+                Log.w(LOG_TAG, "Exception when initializing HTTP Client:\n" + Log.getStackTraceString(e));
+                callbackContext.error(e.getMessage());
+            }
+        }
 
         mClient.setFollowRedirects(false);
         mClient.setFollowSslRedirects(false);
 
-        // mClient.setHostnameVerifier(new HostnameVerifier() {
-        //     @Override
-        //     public boolean verify(String hostname, SSLSession session) {
-        //         return true;
-        //     }
-        // });
+        mClient.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
         
         if (action.equals("fetch")) {
 
