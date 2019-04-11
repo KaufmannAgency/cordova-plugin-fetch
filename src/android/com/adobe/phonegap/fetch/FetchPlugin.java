@@ -2,6 +2,7 @@ package com.adobe.phonegap.fetch;
 
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.ValueCallback;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.Headers;
@@ -111,6 +112,20 @@ public class FetchPlugin extends CordovaPlugin {
                 String urlString = data.getString(1);
                 Log.v(LOG_TAG, "execute: urlString = " + urlString.toString());
 
+                if(method.equals("DELETE") && urlString.endsWith("cookies")) {
+                    Log.v(LOG_TAG, "execute: Removing all cookies on demand.");
+                    CookieManager.getInstance().removeAllCookies(new ValueCallback<Boolean>() {
+                        @Override
+                        public void onReceiveValue(Boolean aBoolean) {
+                            Log.v(LOG_TAG, "execute: removed all cookies, result = " + aBoolean);
+                            callbackContext.sendPluginResult(aBoolean 
+                                ? new PluginResult(PluginResult.Status.OK, "Deleted all cookies")
+                                : new PluginResult(PluginResult.Status.ERROR, "Could not delete cookies"));
+                        }
+                    }); 
+                    return true;                   
+                }
+
                 String postBody = data.getString(2);
                 Log.v(LOG_TAG, "execute: postBody = " + postBody.toString());
 
@@ -123,6 +138,20 @@ public class FetchPlugin extends CordovaPlugin {
                 headers.remove("Cookie");
                 JSONArray cookieArray = new JSONArray();
                 String cookies = CookieManager.getInstance().getCookie(urlString);
+
+                boolean tooManyCookies = cookies != null && !cookies.isEmpty() && cookies.split(";").length > 15;
+                Log.v(LOG_TAG, "execute: checking if too many cookies = " + tooManyCookies + ", cookies: " + cookies);
+                if(tooManyCookies) {
+                    CookieManager.getInstance().removeAllCookies(new ValueCallback<Boolean>() {
+                        @Override
+                        public void onReceiveValue(Boolean aBoolean) {
+                            Log.v(LOG_TAG, "execute: removed all cookies, result = " + aBoolean);
+                            System.exit(0);
+                        }
+                    });
+                    // throw new Exception("Too many logins, cleared all cookies.");
+                }
+
                 LOG.i(LOG_TAG, "Setting cookies to headers: " + cookies);
                 if(cookies != null && !cookies.isEmpty()) {
                     cookieArray.put(cookies.toString());
