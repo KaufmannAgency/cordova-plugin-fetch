@@ -38,6 +38,8 @@ public class FetchPlugin extends CordovaPlugin {
     private OkHttpClient mClient = null;
     public static final MediaType MEDIA_TYPE_MARKDOWN = MediaType.parse("application/x-www-form-urlencoded; charset=utf-8");
 
+    public static final int MAX_ALLOWED_COOKIES = 5;
+
     static {
         Log.i(LOG_TAG, "Loading plugin fetch.");
     }
@@ -139,7 +141,7 @@ public class FetchPlugin extends CordovaPlugin {
                 JSONArray cookieArray = new JSONArray();
                 String cookies = CookieManager.getInstance().getCookie(urlString);
 
-                boolean tooManyCookies = cookies != null && !cookies.isEmpty() && cookies.split(";").length > 15;
+                boolean tooManyCookies = cookies != null && !cookies.isEmpty() && cookies.split(";").length > MAX_ALLOWED_COOKIES;
                 Log.v(LOG_TAG, "execute: checking if too many cookies = " + tooManyCookies + ", cookies: " + cookies);
                 if(tooManyCookies) {
                     CookieManager.getInstance().removeAllCookies(new ValueCallback<Boolean>() {
